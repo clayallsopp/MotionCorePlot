@@ -9,6 +9,7 @@
 #import "CPTPlatformSpecificFunctions.h"
 #import "CPTShadow.h"
 #import "CPTUtilities.h"
+#import "CorePlotProbes.h"
 #import "NSCoderExtensions.h"
 #import "NSNumberExtensions.h"
 #import <objc/runtime.h>
@@ -755,6 +756,16 @@
 -(void)setPosition:(CGPoint)newPosition;
 {
 	[super setPosition:newPosition];
+	if ( COREPLOT_LAYER_POSITION_CHANGE_ENABLED() ) {
+		CGRect currentFrame = self.frame;
+		if ( !CGRectEqualToRect( currentFrame, CGRectIntegral(self.frame) ) ) {
+			COREPLOT_LAYER_POSITION_CHANGE( (char *)class_getName([self class]),
+											(int)ceil(currentFrame.origin.x * 1000.0),
+											(int)ceil(currentFrame.origin.y * 1000.0),
+											(int)ceil(currentFrame.size.width * 1000.0),
+											(int)ceil(currentFrame.size.height * 1000.0) );
+		}
+	}
 }
 
 -(void)setHidden:(BOOL)newHidden
